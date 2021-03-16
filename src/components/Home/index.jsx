@@ -7,7 +7,7 @@ import './index.css';
 
 const Home = () => {
   // state
-  const [selectedAirline, setSelectedAirline] = useState(0);
+  const [selectedAirlineMaxWeight, setSelectedAirlineMaxWeight] = useState(0);
   const [inventory, setInventory] = useState([]);
   const [selectedItem, setSelectedItem] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -29,7 +29,7 @@ const Home = () => {
   },[])
 
   const handleSelectedChange = value => {
-    setSelectedAirline(value.weight);
+    setSelectedAirlineMaxWeight(value.weight);
   };
 
   const handleClickAddItem = (item) => {
@@ -46,9 +46,21 @@ const Home = () => {
     setInventory((prevState) => [...prevState, item]);
   };
 
+  const calculateWeight = () => {
+    const maxWeight = selectedAirlineMaxWeight * 1000;
+    const totalItemsWeight = selectedItem.reduce(function (acc, item) { return acc + item.weight; }, 0);
+    let className = "success";
+    if (totalItemsWeight > maxWeight) {
+      className = "danger";
+    }
+    return <div className={className}>{totalItemsWeight}</div>;
+  };
+
   const options = airlines.map((airline) => {
     return ({ value: airline.id, label: airline.name, weight: airline.weight })
   })
+
+  console.log(selectedItem)
 
   return (
     <>
@@ -115,11 +127,12 @@ const Home = () => {
                 ))}
               </ul>
               <div>
-              
+              {calculateWeight()}
               </div>
             </>
           )
            : null}
+          <button>Voir résumé</button>
         </div>
       </div>
     </>
