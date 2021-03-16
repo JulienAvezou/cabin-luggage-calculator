@@ -3,12 +3,15 @@ import Select from 'react-select';
 import { airlines } from './data';
 import axios from 'axios'
 import Loader from "react-loader-spinner";
-import './index.css';
+import '../../index.css';
 import { Link } from 'react-router-dom';
+
+// components
+import InventoryList from './InventoryList';
 
 const Home = () => {
   // state
-  const [selectedAirlineMaxWeight, setSelectedAirlineMaxWeight] = useState(0);
+  const [selectedAirline, setSelectedAirline] = useState({});
   const [inventory, setInventory] = useState([]);
   const [selectedItem, setSelectedItem] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -34,23 +37,23 @@ const Home = () => {
   useEffect(() => {
     if (selectedItem.length) {
       const calculateWeight = () => {
-        const maxWeight = selectedAirlineMaxWeight * 1000;
+        const maxWeight = selectedAirline.weight * 1000;
         const totalItemsWeight = selectedItem.reduce(function (acc, item) { return acc + item.weight; }, 0);
-        setTotalWeight(totalItemsWeight)
-        console.log('weight', totalWeight)
-        if (totalItemsWeight > maxWeight) {
-          setDisabled(true);
-             
-        } else {
-          setDisabled(false);
+        setTotalWeight(totalItemsWeight);
+        if (selectedAirline.label) {
+          if (totalItemsWeight > maxWeight) {
+            setDisabled(true);        
+          } else {
+            setDisabled(false);
+          }
         }
       };
       calculateWeight();
     }
-  }, [selectedItem])
+  }, [selectedItem, selectedAirline.weight, totalWeight, selectedAirline.label])
 
   const handleSelectedChange = value => {
-    setSelectedAirlineMaxWeight(value.weight);
+    setSelectedAirline(value);
   };
 
   const handleClickAddItem = (item) => {
@@ -73,7 +76,7 @@ const Home = () => {
 
   let params = "";
   selectedItem.forEach((el) => params += `name=${el.name}&weight=${el.weight}&`);
-  console.log(params);
+  params += `airline=${selectedAirline.label}`;
 
   return (
     <>
@@ -85,8 +88,8 @@ const Home = () => {
           isClearable
         />    
       </div>
-      <div style={{marginTop: "10px", width: "650px", display: "flex"}}>
-        <div style={{marginRight: "5px", width: "300px", height: "250px", border: "1px solid black"}}>
+      <div style={{margin: "auto", marginTop: "30px", width: "650px", display: "flex"}}>
+        <div style={{marginRight: "50px", width: "300px", height: "250px", border: "1px solid black"}}>
           {loading
             ? <Loader
                 type="TailSpin"
@@ -96,25 +99,10 @@ const Home = () => {
                 timeout={4000} 
               />
             : (
-              <div>
-              <div>Inventory</div>
-              <ul>
-              {inventory.map((item) => (
-                <li key={item.name} style={{display: "flex", justifyContent: "space-between"}}>
-                  <div>
-                    {item.name}
-                  </div>
-                  <div>
-                    <div className="hidden">{item.weight}</div>
-                    <div
-                      className="show add"
-                      onClick={() => handleClickAddItem(item)}
-                    >Add</div>
-                  </div>
-                </li>
-              ))}
-              </ul>
-              </div>
+              <InventoryList
+                data={inventory}
+                onHandleClickAddItem={handleClickAddItem}
+              />
             )
           }
         </div>
