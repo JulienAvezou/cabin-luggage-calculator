@@ -49,13 +49,12 @@ const Home = () => {
 
   // update total weight calculator and control button state
   useEffect(() => {
-    if (selectedItemsList.length) {
       const calculateWeight = () => {
         const maxWeight = selectedAirline.weight * 1000;
         const totalItemsWeight = selectedItemsList.reduce((acc, item) => { return acc + item.weight; }, 0);
         setTotalWeight(totalItemsWeight);
         if (selectedAirline.label) {
-          if (totalItemsWeight > maxWeight) {
+          if (totalItemsWeight > maxWeight || selectedItemsList.length === 0) {
             setIsDisabled(true);        
           } else {
             setIsDisabled(false);
@@ -63,7 +62,6 @@ const Home = () => {
         }
       };
       calculateWeight();
-    }
   }, [selectedItemsList, selectedAirline.weight, totalWeight, selectedAirline.label])
 
   // methods
