@@ -4,6 +4,7 @@ import { airlines } from './data';
 import axios from 'axios'
 import Loader from "react-loader-spinner";
 import './index.css';
+import { Link } from 'react-router-dom';
 
 const Home = () => {
   // state
@@ -11,6 +12,8 @@ const Home = () => {
   const [inventory, setInventory] = useState([]);
   const [selectedItem, setSelectedItem] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [disabled, setDisabled] = useState(true);
+  const [totalWeight, setTotalWeight] = useState(0);
 
   useEffect(() => {
     const fetchInventory = () => {
@@ -28,6 +31,24 @@ const Home = () => {
     fetchInventory();
   },[])
 
+  useEffect(() => {
+    if (selectedItem.length) {
+      const calculateWeight = () => {
+        const maxWeight = selectedAirlineMaxWeight * 1000;
+        const totalItemsWeight = selectedItem.reduce(function (acc, item) { return acc + item.weight; }, 0);
+        setTotalWeight(totalItemsWeight)
+        console.log('weight', totalWeight)
+        if (totalItemsWeight > maxWeight) {
+          setDisabled(true);
+             
+        } else {
+          setDisabled(false);
+        }
+      };
+      calculateWeight();
+    }
+  }, [selectedItem])
+
   const handleSelectedChange = value => {
     setSelectedAirlineMaxWeight(value.weight);
   };
@@ -44,16 +65,6 @@ const Home = () => {
     const filteredSelectedInventory = selectedInventory.filter(el => el.name !== item.name);
     setSelectedItem(filteredSelectedInventory);
     setInventory((prevState) => [...prevState, item]);
-  };
-
-  const calculateWeight = () => {
-    const maxWeight = selectedAirlineMaxWeight * 1000;
-    const totalItemsWeight = selectedItem.reduce(function (acc, item) { return acc + item.weight; }, 0);
-    let className = "success";
-    if (totalItemsWeight > maxWeight) {
-      className = "danger";
-    }
-    return <div className={className}>{totalItemsWeight}</div>;
   };
 
   const options = airlines.map((airline) => {
@@ -127,12 +138,17 @@ const Home = () => {
                 ))}
               </ul>
               <div>
-              {calculateWeight()}
+                <div className={disabled ? "danger" : "success"}>{totalWeight}</div>
               </div>
             </>
           )
            : null}
-          <button>Voir résumé</button>
+          <Link 
+            className={`button ${disabled && "disabled-button"}`}
+            to="/report?"
+          >
+            Voir résumé
+          </Link>
         </div>
       </div>
     </>
