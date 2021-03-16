@@ -1,0 +1,16 @@
+.hidden:hover {
+  display: none;
+}
+
+.add {
+  display: none;
+}
+
+.weight {
+  width: 50px;
+  padding: 2px;
+}
+
+.hidden:hover + .add {
+  display: block;
+}
