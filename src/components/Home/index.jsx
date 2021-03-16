@@ -71,7 +71,9 @@ const Home = () => {
     return ({ value: airline.id, label: airline.name, weight: airline.weight })
   })
 
-  console.log(selectedItem)
+  let params = "";
+  selectedItem.forEach((el) => params += `name=${el.name}&weight=${el.weight}&`);
+  console.log(params);
 
   return (
     <>
@@ -145,7 +147,7 @@ const Home = () => {
            : null}
           <Link 
             className={`button ${disabled && "disabled-button"}`}
-            to="/report?"
+            to={`/report?${params}`}
           >
             Voir résumé
           </Link>
